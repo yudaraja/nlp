@@ -32,18 +32,3 @@ Proyek ini merupakan implementasi sistem ujian online yang menggunakan Natural L
 -   **Cosine Similarity**: 0.2521
 
 -   **Skor**: 25 (dengan threshold 80, hasilnya tidak memenuhi threshold)
-
-## Cara Menggunakan
-
-1. Clone repositori ini ke lokal Anda.
-2. Install dependencies dengan menjalankan `composer install` dan `npm install`.
-3. Jalankan migrasi database dengan `php artisan migrate`.
-4. Jalankan server lokal dengan `php artisan serve`.
-
-## Kontribusi
-
-Kontribusi sangat diterima! Silakan fork repositori ini dan buat pull request dengan perubahan Anda.
-
-## Lisensi
-
-Proyek ini dilisensikan di bawah [MIT License](LICENSE).
