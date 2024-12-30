@@ -1,66 +1,49 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Proyek Sistem Ujian dengan Pengecekan Jawaban Esai Menggunakan NLP
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Proyek ini merupakan implementasi sistem ujian online yang menggunakan Natural Language Processing (NLP) untuk memeriksa jawaban esai siswa. Sistem ini mengandalkan teknik-teknik NLP seperti tokenisasi, stemming, dan perhitungan cosine similarity untuk membandingkan jawaban siswa dengan kunci jawaban, serta memberikan skor berdasarkan tingkat kemiripan antara keduanya.
 
-## About Laravel
+## Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   **Tokenisasi**: Memecah teks jawaban dan kunci jawaban menjadi kata-kata individu (tokens).
+-   **Stemming**: Mengubah kata-kata dalam jawaban dan kunci jawaban ke bentuk dasarnya.
+-   **TF-IDF**: Menghitung pentingnya setiap kata dalam konteks jawaban dan kunci jawaban menggunakan nilai TF-IDF.
+-   **Cosine Similarity**: Menghitung tingkat kemiripan antara jawaban siswa dan kunci jawaban untuk menilai seberapa relevan jawaban siswa dengan kunci jawaban.
+-   **Skor dan Threshold**: Memberikan skor berdasarkan kemiripan dan membandingkannya dengan nilai threshold untuk menentukan apakah jawaban siswa memenuhi kriteria atau tidak.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Contoh Input dan Output
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+**Input:**
 
-## Learning Laravel
+-   **Soal**: "Siapakah yang memproklamasikan kemerdekaan Indonesia?"
+-   **Jawaban Siswa**: "yang memproklamasikan adalah presiden soekarno"
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**Output:**
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+-   **Tokenisasi**:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+    -   Kunci Jawaban: "proklamasi, kemerdekaan, indonesia, dibacakan, soekarno, tanggal, 17, agustus, 1945"
+    -   Jawaban Siswa: "memproklamasikan, presiden, soekarno"
 
-## Laravel Sponsors
+-   **Stemming**:
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+    -   Kunci Jawaban: "proklamasi, merdeka, indonesia, baca, soekarno, tanggal, 17, agustus, 1945"
+    -   Jawaban Siswa: "proklamasi, presiden, soekarno"
 
-### Premium Partners
+-   **Cosine Similarity**: 0.2521
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+-   **Skor**: 25 (dengan threshold 80, hasilnya tidak memenuhi threshold)
 
-## Contributing
+## Cara Menggunakan
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. Clone repositori ini ke lokal Anda.
+2. Install dependencies dengan menjalankan `composer install` dan `npm install`.
+3. Jalankan migrasi database dengan `php artisan migrate`.
+4. Jalankan server lokal dengan `php artisan serve`.
 
-## Code of Conduct
+## Kontribusi
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Kontribusi sangat diterima! Silakan fork repositori ini dan buat pull request dengan perubahan Anda.
 
-## Security Vulnerabilities
+## Lisensi
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Proyek ini dilisensikan di bawah [MIT License](LICENSE).
