@@ -9,15 +9,15 @@ nltk.download('stopwords')
 nltk.download('punkt')
 
 def preprocess(text):
-    from nltk.corpus import stopwords
-    stop_words = set(stopwords.words('indonesian'))
-    tokens = nltk.word_tokenize(text.lower())
-    filtered_tokens = [word for word in tokens if word.isalnum() and word not in stop_words]
+    from nltk.corpus import stopwords # mengimport daftar stopword dari library nltk
+    stop_words = set(stopwords.words('indonesian')) # mengambil daftar stopword bahasa indonesia
+    tokens = nltk.word_tokenize(text.lower()) # tokenisasi kalimat menjadi kata-kata
+    filtered_tokens = [word for word in tokens if word.isalnum() and word not in stop_words] # menghapus kata-kata yang bukan alfabet dan stopword
 
     # Stemming
-    stemmer_factory = StemmerFactory()
-    stemmer = stemmer_factory.create_stemmer()
-    stemmed_tokens = [stemmer.stem(word) for word in filtered_tokens]
+    stemmer_factory = StemmerFactory() # membuat objek stemmer
+    stemmer = stemmer_factory.create_stemmer() # membuat stemmer bahasa indonesia
+    stemmed_tokens = [stemmer.stem(word) for word in filtered_tokens] # stemming kata-kata
 
     return {
         'tokens': filtered_tokens,
@@ -35,33 +35,31 @@ if __name__ == "__main__":
     key_answer = sys.argv[2]
 
     # Preprocessing
-    processed_answer = preprocess(answer)
-    processed_key_answer = preprocess(key_answer)
+    processed_answer = preprocess(answer) # memproses jawaban
+    processed_key_answer = preprocess(key_answer) # memproses kunci jawaban
 
     # TF-IDF Calculation
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform([processed_key_answer['stemmed'], processed_answer['stemmed']])
-    cos_sim = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])
+    vectorizer = TfidfVectorizer() # membuat objek tfidf vectorizer
+    tfidf_matrix = vectorizer.fit_transform([processed_key_answer['stemmed'], processed_answer['stemmed']]) # menghitung tfidf dari kunci jawaban dan jawaban
+    cos_sim = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2]) # menghitung cosine similarity dari kunci jawaban dan jawaban
 
     # Convert similarity to percentage
     score = int(cos_sim[0][0] * 100)
 
-    # Get TF-IDF values for the documents
+    # Get TF-IDF values / untuk result
     tfidf_values = {
         'key_answer_tfidf': dict(zip(vectorizer.get_feature_names_out(), tfidf_matrix[0].toarray()[0])),
         'answer_tfidf': dict(zip(vectorizer.get_feature_names_out(), tfidf_matrix[1].toarray()[0]))
     }
 
-    # Prepare result
     result = {
         'score': score,
-        'cosineSimilarity': cos_sim[0][0] * 100,  # Add cosine similarity
-        'threshold': 80,  # Threshold for similarity, adjust as needed
-        'isAboveThreshold': score >= 80,  # Check if score is above the threshold
+        'cosineSimilarity': cos_sim[0][0] * 100,
+        'threshold': 80,
+        'isAboveThreshold': score >= 80,
         'processedAnswer': processed_answer,
         'processedKeyAnswer': processed_key_answer,
         'tfidf_values': tfidf_values
     }
 
-    # Output as JSON
     print(json.dumps(result))

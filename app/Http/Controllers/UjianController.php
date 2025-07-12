@@ -16,11 +16,13 @@ class UjianController extends Controller
      */
     public function index()
     {
+        // Fetch questions with user answers for the authenticated user
         $questions = Question::with([
             'userAnswers' => function ($query) {
                 $query->where('user_id', auth()->id());
             }
         ])->paginate(10);
+
         return view('ujian.index', compact('questions'));
     }
 
@@ -29,7 +31,7 @@ class UjianController extends Controller
      */
     public function create()
     {
-        //
+        // Not implemented
     }
 
     /**
@@ -37,7 +39,7 @@ class UjianController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        // Not implemented
     }
 
     /**
@@ -45,35 +47,28 @@ class UjianController extends Controller
      */
     public function show(string $id)
     {
-        // Temukan jawaban berdasarkan ID dan user_id
         $userAnswer = UserAnswer::with('question')
             ->where('question_id', $id)
             ->where('user_id', Auth::id())
             ->firstOrFail();
 
-        // Path ke skrip Python
         $pythonScriptPath = base_path('python/calculate_similarity.py');
         $answer = escapeshellarg($userAnswer->answer);
         $keyAnswer = escapeshellarg($userAnswer->question->answer_key);
 
-        // Menjalankan skrip Python dan mengambil hasilnya
         $command = "python $pythonScriptPath $answer $keyAnswer";
-        $jsonResult = shell_exec($command);  // Mengambil hasil output JSON
+        $jsonResult = shell_exec($command);
 
-        // Menangani error jika hasilnya kosong
         if (!$jsonResult) {
             return redirect()->route('ujian.index')->with('error', 'Gagal menghitung skor kesamaan. Silakan coba lagi.');
         }
 
-        // Mengonversi JSON ke array PHP
         $result = json_decode($jsonResult, true);
 
-        // Cek apakah terjadi error pada Python (misal: argumen tidak cukup)
         if (isset($result['error'])) {
             return redirect()->route('ujian.index')->with('error', $result['error']);
         }
 
-        // Ambil nilai-nilai yang ingin ditampilkan
         $processedAnswer = $result['processedAnswer'];
         $processedKeyAnswer = $result['processedKeyAnswer'];
         $tfidfValues = $result['tfidf_values'];
@@ -82,37 +77,32 @@ class UjianController extends Controller
         $threshold = $result['threshold'];
         $isAboveThreshold = $result['isAboveThreshold'];
 
-        // Data untuk ditampilkan
         $data = [
             'answer' => $userAnswer->answer,
-            'tokensAnswer' => $processedAnswer['tokens'], // Tokenisasi jawaban
-            'stemmedAnswer' => $processedAnswer['stemmed'], // Hasil stemming jawaban
+            'tokensAnswer' => $processedAnswer['tokens'], // Tokenized answer
+            'stemmedAnswer' => $processedAnswer['stemmed'], // Stemmed answer
 
             'keyAnswer' => $userAnswer->question->answer_key,
-            'tokensKeyAnswer' => $processedKeyAnswer['tokens'], // Tokenisasi jawaban kunci
-            'stemmedKeyAnswer' => $processedKeyAnswer['stemmed'], // Hasil stemming jawaban kunci
+            'tokensKeyAnswer' => $processedKeyAnswer['tokens'], // Tokenized key answer
+            'stemmedKeyAnswer' => $processedKeyAnswer['stemmed'], // Stemmed key answer
 
             'score' => $score,
             'cosineSimilarity' => $cosineSimilarity,
             'isAboveThreshold' => $isAboveThreshold,
             'threshold' => $threshold,
-            'tfidfValues' => $tfidfValues,  // Nilai TF-IDF
-            'question' => $userAnswer->question->content, // Menampilkan soal atau pertanyaan
+            'tfidfValues' => $tfidfValues,  // TF-IDF values
+            'question' => $userAnswer->question->content, // Display the question
         ];
 
         return view('ujian.show', compact('data'));
     }
-
-
-
-
 
     /**
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
     {
-        //
+        // Not implemented
     }
 
     /**
@@ -120,7 +110,7 @@ class UjianController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Not implemented
     }
 
     /**
@@ -128,54 +118,61 @@ class UjianController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        // Not implemented
     }
 
+    /**
+     * Display the form to answer a specific question.
+     */
     public function kerjakan($questionId)
     {
-        // Ambil soal berdasarkan ID
+        // Fetch the question by ID
         $question = Question::findOrFail($questionId);
 
         return view('ujian.kerjakan', compact('question'));
     }
 
+    /**
+     * Submit the user's answer for a specific question.
+     */
     public function submit(Request $request, $questionId)
     {
+        // Validate the request
         $validated = $request->validate([
             'answer' => 'required|string',
         ]);
 
-        // Path ke skrip Python
+        // Path to the Python script
         $pythonScriptPath = base_path('python/calculate_similarity.py');
         $answer = escapeshellarg($validated['answer']);
         $keyAnswer = escapeshellarg(Question::find($questionId)->answer_key);
 
-        // Menjalankan skrip Python dan mengambil hasilnya
+        // Execute the Python script and get the result
         $command = "python $pythonScriptPath $answer $keyAnswer";
-        $jsonResult = shell_exec($command);  // Mengambil hasil output JSON
+        $jsonResult = shell_exec($command);
 
-        // Menangani error jika hasilnya kosong
+        // Handle error if the result is empty
         if (!$jsonResult) {
             return redirect()->route('ujian.index')->with('error', 'Gagal menghitung skor kesamaan. Silakan coba lagi.');
         }
 
-        // Mengonversi JSON ke array PHP
+        // Convert JSON result to PHP array
         $result = json_decode($jsonResult, true);
 
-        // Cek apakah terjadi error pada Python (misal: argumen tidak cukup)
+        // Check for errors in the Python script (e.g., insufficient arguments)
         if (isset($result['error'])) {
             return redirect()->route('ujian.index')->with('error', $result['error']);
         }
 
-        // Ambil score dari hasil JSON
+        // Extract the similarity score from the result
         $similarityScore = $result['score'];
 
-        // Simpan jawaban dan skor ke database
+        // Save the user's answer and score to the database
         $userAnswer = UserAnswer::updateOrCreate(
             ['question_id' => $questionId, 'user_id' => Auth::id()],
             [
                 'answer' => $validated['answer'],
-                'score' => (int) $similarityScore, // Pastikan skor disimpan sebagai integer
+                'score' => (int) $similarityScore, // Ensure the score is saved as an integer
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
@@ -183,8 +180,4 @@ class UjianController extends Controller
 
         return redirect()->route('ujian.index')->with('success', 'Jawaban berhasil disubmit dengan skor: ' . $similarityScore);
     }
-
-
-
-
 }

@@ -32,3 +32,15 @@ Proyek ini merupakan implementasi sistem ujian online yang menggunakan Natural L
 -   **Cosine Similarity**: 0.2521
 
 -   **Skor**: 25 (dengan threshold 80, hasilnya tidak memenuhi threshold)
+
+---
+
+## 📸 Screenshot Tampilan
+
+![Screenshot 1](https://github.com/user-attachments/assets/e9d9127f-343e-4740-ae8b-81e33d5541b7)
+
+![Screenshot 2](https://github.com/user-attachments/assets/e569cb26-4b6d-4014-9600-0dc6121cd905)
+
+![Screenshot 3](https://github.com/user-attachments/assets/d5d9fcbb-0068-4948-9fee-6a441443c5dd)
+
+![Screenshot 4](https://github.com/user-attachments/assets/05124546-9db4-43f5-9b5a-5230887df05a)
